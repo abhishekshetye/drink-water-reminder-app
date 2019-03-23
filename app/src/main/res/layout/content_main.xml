@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.codekage.explorify.MainActivity"
+    android:background="@drawable/main_background"
+    tools:showIn="@layout/app_bar_main">
+
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    >
+
+
+    <LinearLayout
+        android:id="@+id/freespace"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        />
+
+    <LinearLayout
+        android:id="@+id/upper_nav_container"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@+id/freespace"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/todayStatsButton"
+            android:layout_width="20sp"
+            android:layout_height="40sp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/button_round_background"
+            android:text="Today"
+            android:textColor="#8399ce"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/weekStatsButton"
+            android:layout_width="20sp"
+            android:layout_height="40sp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="This Week"
+            android:textColor="#8399ce"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/monthStatsButton"
+            android:layout_width="20sp"
+            android:layout_height="40sp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:text="This Month"
+            android:textColor="#8399ce"
+            android:textSize="13sp" />
+
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/header_center_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Drink Water"
+        android:textSize="17sp"
+        android:textColor="#8399ce"
+        app:layout_constraintTop_toBottomOf="@+id/upper_nav_container"
+        android:gravity="center_vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="30dp"/>
+
+
+
+    <TextView
+        android:id="@+id/waterDrankText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1,500 ml"
+        android:textColor="#fff"
+        android:textSize="35sp"
+        android:layout_marginTop="120dp"
+        app:layout_constraintTop_toBottomOf="@id/header_center_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="270dp"
+        android:layout_height="270dp"
+        app:cpb_background_progressbar_color="#FFCDD2"
+        app:cpb_progress="50"
+        app:cpb_background_progressbar_width="5dp"
+        app:cpb_progressbar_color="#F44336"
+        app:cpb_progressbar_width="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/header_center_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="10dp"/>
+
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
+        android:layout_marginTop="10dp">
+
+    </com.github.mikephil.charting.charts.LineChart>
+
+
+    <LinearLayout
+        android:id="@+id/stats_container"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lineChart"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Average Water Consumption"
+                android:textColor="#8399ce"
+                android:textSize="15sp"
+                android:layout_gravity="center"
+                android:gravity="center"/>
+
+
+            <TextView
+                android:id="@+id/avgWaterConsumptionText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1,500 ml/day"
+                android:textColor="#eca926"
+                android:textSize="14sp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="5dp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Outstanding Water Consumption"
+                android:textColor="#8399ce"
+                android:textSize="15sp"
+                android:layout_gravity="center"
+                android:gravity="center"/>
+
+
+            <TextView
+                android:id="@+id/outStandingWaterText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1,200 ml"
+                android:textColor="#eca926"
+                android:textSize="14sp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="5dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/drinkWaterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_round_background_big"
+        android:textSize="17sp"
+        android:padding="10dp"
+        android:text="Drink Water"
+        android:textColor="#fff"
+        app:layout_constraintTop_toBottomOf="@+id/stats_container"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+
+</android.support.constraint.ConstraintLayout>
+
+
+</ScrollView>
