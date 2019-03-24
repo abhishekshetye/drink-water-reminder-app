@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.codekage.explorify.MainActivity"
+    android:background="@drawable/main_background">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="25dp"
+        android:padding="25dp">
+
+        <com.sdsmdg.harjot.crollerTest.Croller
+            android:id="@+id/croller"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_gravity="center"
+            android:layout_centerInParent="true"
+            app:back_circle_color="#EDEDED"
+            app:indicator_color="#F44336"
+            app:indicator_width="10"
+            app:is_continuous="true"
+            app:label_color="#000000"
+            app:main_circle_color="#283568"
+            app:max="4000"
+            app:label="Water Consumption"
+            app:progress_primary_color="#F44336"
+            app:progress_secondary_color="#EEEEEE"
+            app:start_offset="45" />
+
+
+    <TextView
+        android:id="@+id/water_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="150 ml"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:textColor="#fff"
+            android:background="@drawable/button_round_background_big"
+            android:text="Save"
+            android:layout_gravity="center"
+            android:layout_marginTop="25dp"/>
+    </FrameLayout>
+</FrameLayout>

@@ -1,9 +1,12 @@
 package com.codekage.explorify
 
 import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
@@ -12,23 +15,27 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import com.codekage.explorify.activities.SettingsActivity
 import com.codekage.explorify.core.WaterConsumptionStatsGatherer
 import com.codekage.explorify.core.consumptions.MonthWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.consumptions.TodayWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.consumptions.WeekWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.database.DataHandler
+import com.codekage.explorify.core.notification.NotificationHandler
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -44,6 +51,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var waterDrankText: TextView ?= null
     private var outstandingWaterText: TextView ?= null
     private var avgWaterConsumptionText: TextView ?= null
+    private var navigationButton: Button ?= null
+    private var settingsButton: Button ?= null
 
     private var selectedStatsSelectableDrawable: Drawable?= null
 
@@ -52,6 +61,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var weekWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer ?= null
     private var todayWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer ?= null
     private var currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer ?= null
+    private var notificationHandler = NotificationHandler()
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,12 +70,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        initDataHandlerAndStatsGatherer()
-        initUIComponents()
-        setUpChartAxes(lineChart)
-        setTodayGathererAsCurrentGathererAndPopulate()
-
-        dataHandler?.getAllWaterConsumptionData()?.let { dataHandler?.printDataAsLogs(it) }
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -72,41 +77,52 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        initUIComponents()
+        initDataHandlerAndStatsGatherer()
+        setUpChartAxes(lineChart)
+        setTodayGathererAsCurrentGathererAndPopulate()
+
+        dataHandler?.getAllWaterConsumptionData()?.let { dataHandler?.printDataAsLogs(it) }
+
+
     }
 
 
     private fun setTodayGathererAsCurrentGathererAndPopulate(){
-        removeSelectedResource()
-        todayStatsButton?.setBackgroundResource(R.drawable.button_round_background)
+        removeHighlightedBorderOnButton()
         currentWaterConsumptionStatsGatherer = todayWaterConsumptionStatsGatherer
         populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
     }
 
-    private fun removeSelectedResource() {
+    private fun removeHighlightedBorderOnButton() {
         todayStatsButton?.setBackgroundColor(Color.TRANSPARENT)
         weekStatsButton?.setBackgroundColor(Color.TRANSPARENT)
         monthStatsButton?.setBackgroundColor(Color.TRANSPARENT)
     }
 
     private fun setWeekGathererAsCurrentGathererAndPopulate(){
-        removeSelectedResource()
-        weekStatsButton?.setBackgroundResource(R.drawable.button_round_background)
+        removeHighlightedBorderOnButton()
         currentWaterConsumptionStatsGatherer = weekWaterConsumptionStatsGatherer
         populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
     }
 
     private fun setMonthGathererAsCurrentGathererAndPopulate(){
-        removeSelectedResource()
-        monthStatsButton?.setBackgroundResource(R.drawable.button_round_background)
+        removeHighlightedBorderOnButton()
         currentWaterConsumptionStatsGatherer = monthsWaterConsumptionStatsGatherer
         populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
     }
 
     private fun populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer?){
+        currentWaterConsumptionStatsGatherer?.putHighlightedBorderOnButton()
         fetchDataFromStatsGathererAndPopulateUI(currentWaterConsumptionStatsGatherer)
         var totalWaterDrank = currentWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
+        setCircularProgressBar(totalWaterDrank)
         waterDrankText?.text = "$totalWaterDrank ml"
         avgWaterConsumptionText?.text = "${totalWaterDrank?.div((currentWaterConsumptionStatsGatherer?.getDaysOffSet()?.plus(1)!!))} ml"
+        var outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
+        outStandingWater = if (outStandingWater <= 0) 0f else outStandingWater
+        outStandingWaterText?.text = "$outStandingWater ml"
     }
 
     private fun fetchDataFromStatsGathererAndPopulateUI(statsGatherer: WaterConsumptionStatsGatherer?){
@@ -116,10 +132,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             entries?.let { populateChart(it) }
     }
 
+    private fun setCircularProgressBar(totalWaterDrank : Int?) {
+        progressBar.progress = 0f
+        progressBar.enableIndeterminateMode(true)
+        object: CountDownTimer(2000, 2000){
+            override fun onFinish() {
+                runOnUiThread {
+                    progressBar.enableIndeterminateMode(false)
+                    if(getWaterDailyGoal() == 0)
+                    {
+                        Toast.makeText(applicationContext, "Daily water consumption goal cannot be zeroooo!", Toast.LENGTH_SHORT).show()
+                    }else {
+                        progressBar.progress = totalWaterDrank?.toFloat()!!.div(getWaterDailyGoal().toFloat()).times(100f)
+                        Log.d("UI", "Water drank $totalWaterDrank and ${getWaterDailyGoal()} ml")
+                    }
+                }
+            }
+            override fun onTick(p0: Long) {}
+        }.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(currentWaterConsumptionStatsGatherer!=null)
+            populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
+    }
+
 
     private fun initUIComponents() {
         selectedStatsSelectableDrawable = ContextCompat.getDrawable(this, R.drawable.button_round_background)
-
         lineChart = this.findViewById(R.id.lineChart)
         drinkWaterButton = this.findViewById(R.id.drinkWaterButton)
         drinkWaterButton!!.setOnClickListener({
@@ -132,18 +173,45 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         waterDrankText = this.findViewById(R.id.waterDrankText)
         avgWaterConsumptionText = this.findViewById(R.id.avgWaterConsumptionText)
         outstandingWaterText = this.findViewById(R.id.outStandingWaterText)
+        settingsButton = this.findViewById(R.id.settings_button)
+        navigationButton = this.findViewById(R.id.navigation_button)
 
-        todayStatsButton!!.setOnClickListener(View.OnClickListener {
+        todayStatsButton!!.setOnClickListener({
             setTodayGathererAsCurrentGathererAndPopulate()
         })
 
-        weekStatsButton!!.setOnClickListener(View.OnClickListener {
+        weekStatsButton!!.setOnClickListener({
             setWeekGathererAsCurrentGathererAndPopulate()
         })
 
-        monthStatsButton!!.setOnClickListener(View.OnClickListener {
+        monthStatsButton!!.setOnClickListener({
             setMonthGathererAsCurrentGathererAndPopulate()
         })
+
+        settingsButton!!.setOnClickListener({
+            openSettingsActivity()
+        })
+
+        navigationButton!!.setOnClickListener({
+            openNavigationDrawer()
+        })
+    }
+
+    private fun openSettingsActivity() {
+        var intent = Intent(this, SettingsActivity::class.java)
+        intent.putExtra("OUTSTANDING_WATER", getOutStandingWater())
+        startActivity(intent)
+    }
+
+
+    private fun getOutStandingWater() : Float {
+        var totalWaterDrank = todayWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
+        var outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
+        return if (outStandingWater <= 0) 0f else outStandingWater
+    }
+
+    private fun openNavigationDrawer() {
+        drawer_layout.openDrawer(GravityCompat.START)
     }
 
     private fun createInsertDialog(): Dialog {
@@ -163,7 +231,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val status = dataHandler?.saveWaterConsumption(getCurrentDateInString(), waterInput.progress)
             Log.d("SAVING", "Done saving. Returned status is $status")
             Toast.makeText(applicationContext, "Saved entry", Toast.LENGTH_SHORT).show()
-            fetchDataFromStatsGathererAndPopulateUI(todayWaterConsumptionStatsGatherer)
+            populateUIWithWaterGathererStats(todayWaterConsumptionStatsGatherer)
             dialog.dismiss()
         })
         return dialog
@@ -177,9 +245,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initDataHandlerAndStatsGatherer() {
         dataHandler = DataHandler(this)
-        monthsWaterConsumptionStatsGatherer = MonthWaterConsumptionStatsGatherer(dataHandler!!)
-        weekWaterConsumptionStatsGatherer = WeekWaterConsumptionStatsGatherer(dataHandler!!)
-        todayWaterConsumptionStatsGatherer = TodayWaterConsumptionStatsGatherer(dataHandler!!)
+        monthsWaterConsumptionStatsGatherer = MonthWaterConsumptionStatsGatherer(dataHandler!!, monthStatsButton)
+        weekWaterConsumptionStatsGatherer = WeekWaterConsumptionStatsGatherer(dataHandler!!, weekStatsButton)
+        todayWaterConsumptionStatsGatherer = TodayWaterConsumptionStatsGatherer(dataHandler!!, todayStatsButton)
+    }
+
+    private fun getWaterDailyGoal() : Int{
+        val sharedPrefs = getSharedPreferences(resources.getString(R.string.prefs_name), Context.MODE_PRIVATE)
+        return sharedPrefs.getInt(resources.getString(R.string.water_daily_goal), 2000)
     }
 
     private fun populateChart(entries : List<Entry> ){
@@ -204,7 +277,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun createLineData(dataSet: LineDataSet) : LineData{
         var lineData = LineData(dataSet)
-        lineData?.isHighlightEnabled = true
+        lineData.isHighlightEnabled = true
         return lineData
     }
 
@@ -269,5 +342,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        notificationHandler.closeNotification(applicationContext)
     }
 }
