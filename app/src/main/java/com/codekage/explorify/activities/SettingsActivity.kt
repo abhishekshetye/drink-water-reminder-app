@@ -1,22 +1,22 @@
 package com.codekage.explorify.activities
 
-import android.app.*
+import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.codekage.explorify.R
-import com.codekage.explorify.core.notification.NotificationHandler
+import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotification
+import com.codekage.explorify.core.notification.NotificationHandler.Companion.setReminderToDrinkWaterEveryCoupleHours
 import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity() {
 
-    private var notificationHandler: NotificationHandler ?= null
     private var outStandingWater: Float = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,22 +25,29 @@ class SettingsActivity : AppCompatActivity() {
 
         outStandingWater = intent?.extras?.getFloat("OUTSTANDING_WATER")!!
 
-        udpateUI()
-        notificationHandler = NotificationHandler()
+        updateUI()
 
         waterLimitOptionTab.setOnClickListener {
             var dialog = createWaterLimitInputDialog()
             dialog.show()
         }
 
-
         notificationOptionTab.setOnClickListener({
-            notificationHandler?.setNotification(applicationContext, "$outStandingWater ml water outstanding for today's goal")
+            setNotification(applicationContext, "$outStandingWater ml water outstanding for today's goal")
             Toast.makeText(this, "Notification set", Toast.LENGTH_SHORT).show()
         })
 
-    }
+        reminderOptionTab.setOnClickListener({
+            var featureEnabled = toggleReminderSetting()
+            if (featureEnabled) {
+                setReminderToDrinkWaterEveryCoupleHours(applicationContext)
+                Toast.makeText(this, "Alarm set for every 2 hours", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Alarm disabled", Toast.LENGTH_SHORT).show()
+            }
+        })
 
+    }
 
     private fun createWaterLimitInputDialog(): Dialog {
         var dialog = Dialog(this)
@@ -49,28 +56,33 @@ class SettingsActivity : AppCompatActivity() {
         var waterInput = dialog.findViewById<Croller>(R.id.croller)
         waterInput.progress = 200
         waterInput.setOnProgressChangedListener { progress ->
-            text.text = "$progress ml"
+            text.text = "${getRoundedProgress(progress)} ml"
         }
         waterInput.labelColor = Color.WHITE
 
         var saveButton = dialog.findViewById<Button>(R.id.saveButton)
         saveButton.setOnClickListener({
             Log.d("SAVING", "Setting ${waterInput.progress} ml of water as daily goal")
-            var savedSuccessfully = saveWaterConsumptionGoalInSharedPrefs(waterInput.progress)
-            if(savedSuccessfully) {
-                Toast.makeText(applicationContext, "Saved daily water consumption goal as ${waterInput.progress} ml", Toast.LENGTH_SHORT).show()
-                udpateUI()
+            var savedSuccessfully = saveWaterConsumptionGoalInSharedPrefs(getRoundedProgress(waterInput.progress))
+            if (savedSuccessfully) {
+                Toast.makeText(applicationContext, "Saved daily water consumption goal as ${getRoundedProgress(waterInput.progress)} ml", Toast.LENGTH_SHORT).show()
+                updateUI()
                 dialog.dismiss()
             }
         })
         return dialog
     }
 
-    private fun udpateUI(){
+
+    private fun getRoundedProgress(progress: Int): Int {
+        return (progress + 4) / 5 * 5
+    }
+
+    private fun updateUI() {
         setWaterLimitSubText.text = "${getWaterDailyGoal()} ml"
     }
 
-    private fun saveWaterConsumptionGoalInSharedPrefs(progress: Int) : Boolean {
+    private fun saveWaterConsumptionGoalInSharedPrefs(progress: Int): Boolean {
         if (progress <= 500) {
             Toast.makeText(applicationContext, "$progress ml is way too less as daily goal. Please refer information tab to know regarding your daily limit.", Toast.LENGTH_SHORT).show()
             return false
@@ -82,9 +94,17 @@ class SettingsActivity : AppCompatActivity() {
         return true
     }
 
-    private fun getWaterDailyGoal() : Int{
+    private fun getWaterDailyGoal(): Int {
         val sharedPrefs = getSharedPreferences(resources.getString(R.string.prefs_name), Context.MODE_PRIVATE)
         return sharedPrefs.getInt(resources.getString(R.string.water_daily_goal), 2000)
     }
 
+    private fun toggleReminderSetting(): Boolean {
+        val sharedPrefs = getSharedPreferences(resources.getString(R.string.prefs_name), Context.MODE_PRIVATE)
+        var featureEnabled = sharedPrefs.getBoolean(resources.getString(R.string.reminderEnabled), false)
+        val editor = sharedPrefs.edit()
+        editor.putBoolean(resources.getString(R.string.reminderEnabled), !featureEnabled)
+        editor.apply()
+        return !featureEnabled
+    }
 }

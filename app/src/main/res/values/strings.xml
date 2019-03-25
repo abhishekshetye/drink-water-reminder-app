@@ -6,6 +6,7 @@
 
     <string name="prefs_name">waterConsumptionSharedPrefs</string>
     <string name="water_daily_goal">waterConsumptionDailyGoal</string>
+    <string name="reminderEnabled">reminderEnabled</string>
 
     <string name="action_settings">Settings</string>
 

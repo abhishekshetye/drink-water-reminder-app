@@ -56,7 +56,7 @@ abstract class WaterConsumptionStatsGatherer (dataHandler: DataHandler) {
     private fun convertListToEntries(waterConsumptionList: List<WaterConsumed>): List<Entry> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             return waterConsumptionList.stream()
-                    .map { wc -> Entry(parseDateFromString(wc.date), wc.water.toFloat()) }
+                    .map { wc -> Entry(wc.id.toFloat(), wc.water.toFloat()) }
                     .collect(Collectors.toList())
         }
 

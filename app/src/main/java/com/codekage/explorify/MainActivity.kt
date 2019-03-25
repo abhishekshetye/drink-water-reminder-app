@@ -25,13 +25,12 @@ import com.codekage.explorify.core.consumptions.TodayWaterConsumptionStatsGather
 import com.codekage.explorify.core.consumptions.WeekWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.database.DataHandler
 import com.codekage.explorify.core.notification.NotificationHandler
+import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotification
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var weekWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer ?= null
     private var todayWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer ?= null
     private var currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer ?= null
-    private var notificationHandler = NotificationHandler()
 
 
 
@@ -78,14 +76,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
+        if(intent.extras!=null && intent.extras.getBoolean("FROM_NOTIFICATION"))
+            setNotification(applicationContext, "Reminder to drink water", 700)
+
         initUIComponents()
         initDataHandlerAndStatsGatherer()
         setUpChartAxes(lineChart)
         setTodayGathererAsCurrentGathererAndPopulate()
 
         dataHandler?.getAllWaterConsumptionData()?.let { dataHandler?.printDataAsLogs(it) }
-
-
     }
 
 
@@ -129,7 +128,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var entries = statsGatherer?.fetchWaterEntries()
         Log.d("FETCH_DATA", "Data returned from SQLite ${entries?.size}")
         if(entries!=null && entries.isNotEmpty())
-            entries?.let { populateChart(it) }
+            entries.let { populateChart(it) }
     }
 
     private fun setCircularProgressBar(totalWaterDrank : Int?) {
@@ -221,20 +220,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var waterInput = dialog.findViewById<Croller>(R.id.croller)
         waterInput.progress = 200
         waterInput.setOnProgressChangedListener { progress ->
-            text.text = "$progress ml"
+            text.text = "${getRoundedProgress(progress)} ml"
         }
         waterInput.labelColor = Color.WHITE
 
         var saveButton = dialog.findViewById<Button>(R.id.saveButton)
         saveButton.setOnClickListener({
             Log.d("SAVING", "Saving ${waterInput.progress} ml of water in the DB")
-            val status = dataHandler?.saveWaterConsumption(getCurrentDateInString(), waterInput.progress)
+            val status = dataHandler?.saveWaterConsumption(getCurrentDateInString(), getRoundedProgress(waterInput.progress))
             Log.d("SAVING", "Done saving. Returned status is $status")
             Toast.makeText(applicationContext, "Saved entry", Toast.LENGTH_SHORT).show()
             populateUIWithWaterGathererStats(todayWaterConsumptionStatsGatherer)
             dialog.dismiss()
         })
         return dialog
+    }
+
+    private fun getRoundedProgress(progress: Int) : Int{
+        return (progress + 4) / 5 * 5
     }
 
     private fun getCurrentDateInString() : String {
@@ -346,6 +349,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onDestroy() {
         super.onDestroy()
-        notificationHandler.closeNotification(applicationContext)
+        NotificationHandler.closeNotification(applicationContext)
     }
 }
