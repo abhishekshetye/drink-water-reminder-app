@@ -18,6 +18,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import com.codekage.explorify.activities.AboutMeActivity
 import com.codekage.explorify.activities.SettingsActivity
 import com.codekage.explorify.core.WaterConsumptionStatsGatherer
 import com.codekage.explorify.core.consumptions.MonthWaterConsumptionStatsGatherer
@@ -27,6 +28,7 @@ import com.codekage.explorify.core.database.DataHandler
 import com.codekage.explorify.core.notification.NotificationHandler
 import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotification
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Description
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -35,6 +37,7 @@ import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -115,13 +118,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer?){
         currentWaterConsumptionStatsGatherer?.putHighlightedBorderOnButton()
         fetchDataFromStatsGathererAndPopulateUI(currentWaterConsumptionStatsGatherer)
-        var totalWaterDrank = currentWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
-        setCircularProgressBar(totalWaterDrank)
-        waterDrankText?.text = "$totalWaterDrank ml"
-        avgWaterConsumptionText?.text = "${totalWaterDrank?.div((currentWaterConsumptionStatsGatherer?.getDaysOffSet()?.plus(1)!!))} ml"
+        val totalWaterDrank = currentWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
+        setCircularProgressBar(totalWaterDrank, currentWaterConsumptionStatsGatherer)
+        waterDrankText?.text = "${getFormattedInteger(totalWaterDrank)} ml"
+        val avgWaterConsumption = totalWaterDrank?.div((currentWaterConsumptionStatsGatherer?.getDaysOffSet()?.plus(1)!!))
+        avgWaterConsumptionText?.text = "${getFormattedInteger(avgWaterConsumption)} ml"
         var outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
         outStandingWater = if (outStandingWater <= 0) 0f else outStandingWater
-        outStandingWaterText?.text = "$outStandingWater ml"
+        outStandingWaterText?.text = "${getFormattedInteger(outStandingWater.toInt())} ml"
+    }
+
+    private fun getFormattedInteger(number: Int?): CharSequence? {
+        val formatter = DecimalFormat("#,###,###")
+        return formatter.format(number)
     }
 
     private fun fetchDataFromStatsGathererAndPopulateUI(statsGatherer: WaterConsumptionStatsGatherer?){
@@ -131,7 +140,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             entries.let { populateChart(it) }
     }
 
-    private fun setCircularProgressBar(totalWaterDrank : Int?) {
+    private fun setCircularProgressBar(totalWaterDrank : Int?, currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer?) {
         progressBar.progress = 0f
         progressBar.enableIndeterminateMode(true)
         object: CountDownTimer(2000, 2000){
@@ -142,7 +151,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     {
                         Toast.makeText(applicationContext, "Daily water consumption goal cannot be zeroooo!", Toast.LENGTH_SHORT).show()
                     }else {
-                        progressBar.progress = totalWaterDrank?.toFloat()!!.div(getWaterDailyGoal().toFloat()).times(100f)
+                        var days = currentWaterConsumptionStatsGatherer?.getDaysOffSet()!!.plus(1)
+                        progressBar.progress = totalWaterDrank?.toFloat()!!.div(getWaterDailyGoal().toFloat().times(days)).times(100f)
                         Log.d("UI", "Water drank $totalWaterDrank and ${getWaterDailyGoal()} ml")
                     }
                 }
@@ -241,8 +251,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun getCurrentDateInString() : String {
-        var currentTime = Calendar.getInstance().time
-        var simpleDateFormatter = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        val currentTime = Calendar.getInstance().time
+        val simpleDateFormatter = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
         return simpleDateFormatter.format(currentTime)
     }
 
@@ -285,15 +295,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setUpChartAxes(lineChart: LineChart?) {
-
         val xAxis = lineChart?.xAxis
         xAxis?.position = XAxis.XAxisPosition.BOTTOM
         xAxis?.textSize = 10f
-
+        var description = Description()
+        description.text = ""
+        lineChart?.description = description
+        lineChart?.contentDescription = ""
+        lineChart?.axisLeft?.axisLineColor = resources.getColor(R.color.lightBlue)
+        lineChart?.axisLeft?.textColor = resources.getColor(R.color.lightBlue)
+        lineChart?.xAxis?.axisLineColor = resources.getColor(R.color.lightBlue)
+        lineChart?.xAxis?.textColor = resources.getColor(R.color.lightBlue)
+        lineChart?.axisRight?.setDrawAxisLine(false)
+        lineChart?.axisRight?.setDrawTopYLabelEntry(false)
+        lineChart?.axisRight?.setDrawLabels(false)
         lineChart?.axisLeft?.setDrawGridLines(false);
         lineChart?.xAxis?.setDrawGridLines(false);
         lineChart?.axisRight?.setDrawGridLines(false);
-
     }
 
     override fun onBackPressed() {
@@ -320,31 +338,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun shareApp(){
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                "You know human body is made up of 70% water and your body needs to maintain the water level every single day. " +
+                        "\nCheckout WaterMeter to track daily water consumption - https://play.google.com/store/apps/details?id=com.codekage.explorify !")
+        sendIntent.type = "text/plain"
+        startActivity(sendIntent)
+    }
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
+            R.id.nav_setting -> {
+                openSettingsActivity()
             }
-            R.id.nav_gallery -> {
-
-            }
-            R.id.nav_slideshow -> {
-
-            }
-            R.id.nav_manage -> {
-
+            R.id.nav_about_me -> {
+                openAboutMeActivity()
             }
             R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
-
+                shareApp()
             }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    private fun openAboutMeActivity(){
+        val aboutMeActivityIntent = Intent(this, AboutMeActivity::class.java)
+        startActivity(aboutMeActivityIntent)
     }
 
     override fun onDestroy() {

@@ -52,9 +52,10 @@ class SettingsActivity : AppCompatActivity() {
     private fun createWaterLimitInputDialog(): Dialog {
         var dialog = Dialog(this)
         dialog.setContentView(R.layout.set_water_goal_dialog)
-        var text = dialog.findViewById<TextView>(R.id.water_text)
-        var waterInput = dialog.findViewById<Croller>(R.id.croller)
-        waterInput.progress = 200
+        val text = dialog.findViewById<TextView>(R.id.water_text)
+        val waterInput = dialog.findViewById<Croller>(R.id.croller)
+        waterInput.progress = 2000
+        waterInput.label = "Daily Water Consumption Goal"
         waterInput.setOnProgressChangedListener { progress ->
             text.text = "${getRoundedProgress(progress)} ml"
         }
