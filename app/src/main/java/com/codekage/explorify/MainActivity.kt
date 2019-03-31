@@ -21,6 +21,10 @@ import android.widget.Toast
 import com.codekage.explorify.activities.AboutMeActivity
 import com.codekage.explorify.activities.SettingsActivity
 import com.codekage.explorify.core.WaterConsumptionStatsGatherer
+import com.codekage.explorify.core.utils.Formatter
+import com.codekage.explorify.core.utils.WaterCalculator
+import com.codekage.explorify.core.utils.WaterCalculator.Companion.calculateWaterInTermsOfGlasses
+import com.codekage.explorify.core.utils.WaterCalculator.Companion.getWaterInMultipleOfFive
 import com.codekage.explorify.core.consumptions.MonthWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.consumptions.TodayWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.consumptions.WeekWaterConsumptionStatsGatherer
@@ -55,6 +59,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var avgWaterConsumptionText: TextView ?= null
     private var navigationButton: Button ?= null
     private var settingsButton: Button ?= null
+    private var pendingGlassesOfWaterTextView: TextView ?= null
 
     private var selectedStatsSelectableDrawable: Drawable?= null
 
@@ -126,6 +131,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
         outStandingWater = if (outStandingWater <= 0) 0f else outStandingWater
         outStandingWaterText?.text = "${getFormattedInteger(outStandingWater.toInt())} ml"
+        currentWaterConsumptionStatsGatherer.populatePendingWaterTextView(outStandingWater.toInt())
     }
 
     private fun getFormattedInteger(number: Int?): CharSequence? {
@@ -184,6 +190,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         outstandingWaterText = this.findViewById(R.id.outStandingWaterText)
         settingsButton = this.findViewById(R.id.settings_button)
         navigationButton = this.findViewById(R.id.navigation_button)
+        pendingGlassesOfWaterTextView = this.findViewById(R.id.header_center_text_lower)
 
         todayStatsButton!!.setOnClickListener({
             setTodayGathererAsCurrentGathererAndPopulate()
@@ -214,8 +221,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     private fun getOutStandingWater() : Float {
-        var totalWaterDrank = todayWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
-        var outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
+        val totalWaterDrank = todayWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
+        val outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
         return if (outStandingWater <= 0) 0f else outStandingWater
     }
 
@@ -224,30 +231,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun createInsertDialog(): Dialog {
-        var dialog = Dialog(this)
+        val dialog = Dialog(this)
         dialog.setContentView(R.layout.insert_dialog)
-        var text = dialog.findViewById<TextView>(R.id.water_text)
-        var waterInput = dialog.findViewById<Croller>(R.id.croller)
-        waterInput.progress = 200
+        val glassesOfWaterText = dialog.findViewById<TextView>(R.id.glassesOfWaterText)
+        val text = dialog.findViewById<TextView>(R.id.water_text)
+        val waterInput = dialog.findViewById<Croller>(R.id.croller)
+        waterInput.progress = 240
         waterInput.setOnProgressChangedListener { progress ->
-            text.text = "${getRoundedProgress(progress)} ml"
+            text.text = "${getWaterInMultipleOfFive(progress)} ml"
+            glassesOfWaterText.text = "${Formatter.getTextForGlassesOfWaterInDialog(calculateWaterInTermsOfGlasses(WaterCalculator.getWaterInMultipleOfFive(progress)))}"
         }
         waterInput.labelColor = Color.WHITE
 
         var saveButton = dialog.findViewById<Button>(R.id.saveButton)
         saveButton.setOnClickListener({
             Log.d("SAVING", "Saving ${waterInput.progress} ml of water in the DB")
-            val status = dataHandler?.saveWaterConsumption(getCurrentDateInString(), getRoundedProgress(waterInput.progress))
+            val status = dataHandler?.saveWaterConsumption(getCurrentDateInString(), getWaterInMultipleOfFive(waterInput.progress))
             Log.d("SAVING", "Done saving. Returned status is $status")
             Toast.makeText(applicationContext, "Saved entry", Toast.LENGTH_SHORT).show()
             populateUIWithWaterGathererStats(todayWaterConsumptionStatsGatherer)
             dialog.dismiss()
         })
         return dialog
-    }
-
-    private fun getRoundedProgress(progress: Int) : Int{
-        return (progress + 4) / 5 * 5
     }
 
     private fun getCurrentDateInString() : String {
@@ -258,9 +263,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initDataHandlerAndStatsGatherer() {
         dataHandler = DataHandler(this)
-        monthsWaterConsumptionStatsGatherer = MonthWaterConsumptionStatsGatherer(dataHandler!!, monthStatsButton)
-        weekWaterConsumptionStatsGatherer = WeekWaterConsumptionStatsGatherer(dataHandler!!, weekStatsButton)
-        todayWaterConsumptionStatsGatherer = TodayWaterConsumptionStatsGatherer(dataHandler!!, todayStatsButton)
+        monthsWaterConsumptionStatsGatherer = MonthWaterConsumptionStatsGatherer(dataHandler!!, monthStatsButton, pendingGlassesOfWaterTextView)
+        weekWaterConsumptionStatsGatherer = WeekWaterConsumptionStatsGatherer(dataHandler!!, weekStatsButton, pendingGlassesOfWaterTextView)
+        todayWaterConsumptionStatsGatherer = TodayWaterConsumptionStatsGatherer(dataHandler!!, todayStatsButton, pendingGlassesOfWaterTextView)
     }
 
     private fun getWaterDailyGoal() : Int{

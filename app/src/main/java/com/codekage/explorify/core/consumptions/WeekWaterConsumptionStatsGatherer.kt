@@ -1,6 +1,7 @@
 package com.codekage.explorify.core.consumptions
 
 import android.widget.Button
+import android.widget.TextView
 import com.codekage.explorify.R
 import com.codekage.explorify.core.WaterConsumptionStatsGatherer
 import com.codekage.explorify.core.database.DataHandler
@@ -10,9 +11,10 @@ import com.codekage.explorify.core.database.DataHandler
  * Created by abhisheksimac on 23/03/19.
  */
 
-class WeekWaterConsumptionStatsGatherer (dataHandler: DataHandler, statsButton: Button?) : WaterConsumptionStatsGatherer(dataHandler) {
+class WeekWaterConsumptionStatsGatherer (dataHandler: DataHandler, statsButton: Button?, pendingGlassesOfWaterTextView: TextView?) : WaterConsumptionStatsGatherer(dataHandler) {
 
     var statsButton = statsButton
+    var pendingGlassesOfWaterTextView = pendingGlassesOfWaterTextView
 
     override fun getDaysOffSet(): Int {
         return 7
@@ -20,6 +22,10 @@ class WeekWaterConsumptionStatsGatherer (dataHandler: DataHandler, statsButton: 
 
     override fun getButtonForGatherer(): Button? {
         return statsButton
+    }
+
+    override fun populatePendingWaterTextView(water: Int) {
+        pendingGlassesOfWaterTextView?.text = ""
     }
 
 }

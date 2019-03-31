@@ -7,6 +7,18 @@
     tools:context="com.codekage.explorify.MainActivity"
     android:background="@drawable/main_background">
 
+    <TextView
+        android:id="@+id/glassesOfWaterText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3 Glasses of Water"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#fff"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"/>
+
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

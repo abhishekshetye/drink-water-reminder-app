@@ -12,4 +12,6 @@
 
     <string name="notification_title">Daily Water Drinking Goal</string>
     <string name="notification_subtext">You need to drink %s amount of water to complete your daily goal</string>
+
+    <string name="water_drinking_information">“It depends on your size and weight, and also on your activity level and where you live,” Nessler says. “In general, you should try to drink between half an ounce and an ounce of water for each pound you weigh, every day.” For example, if you weigh 150 pounds, that would be 75 to 150 ounces of water a day. Generally, if you\'re an adult, it is recommended that you drink eight 8-ounce glasses, which equals about 2 liters, or half a gallon. This is called the 8×8 rule and is very easy to remember</string>
 </resources>

@@ -104,7 +104,6 @@
 
     <!-- new -->
 
-
     <android.support.constraint.ConstraintLayout
         android:id="@+id/informationOptionTab"
         android:layout_width="match_parent"

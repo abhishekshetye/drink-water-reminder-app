@@ -1,9 +1,12 @@
 package com.codekage.explorify.core
 
 import android.os.Build
+import android.text.Html
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import com.codekage.explorify.R
+import com.codekage.explorify.core.utils.WaterCalculator
 import com.codekage.explorify.core.database.DataHandler
 import com.codekage.explorify.core.entities.WaterConsumed
 import com.github.mikephil.charting.data.Entry
@@ -24,6 +27,8 @@ abstract class WaterConsumptionStatsGatherer (dataHandler: DataHandler) {
     internal abstract fun getDaysOffSet(): Int
 
     internal abstract fun getButtonForGatherer() : Button?
+
+    internal abstract fun populatePendingWaterTextView(water: Int)
 
     fun putHighlightedBorderOnButton() {
         Log.d("UI", "Putting highlighter on button ${getButtonForGatherer()}")
@@ -51,6 +56,18 @@ abstract class WaterConsumptionStatsGatherer (dataHandler: DataHandler) {
             sum += wc.water
         return sum
     }
+
+
+
+    protected fun getFormattedOutStandingGlassesOfWater(water: Int, textView: TextView) {
+        //val glassesPendingText = "<font color='#F44336'>${WaterCalculator.calculateWaterInTermsOfGlasses(water)}</font> glasses of water remaining"
+        val glassesPendingText = "Around <b><font color='#ffffff'>~${WaterCalculator.calculateWaterInTermsOfGlasses(water)}</font></b> Glasses of Water Remaining!"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            textView.text = Html.fromHtml(glassesPendingText, Html.FROM_HTML_MODE_LEGACY)
+        else
+            textView.text = Html.fromHtml(glassesPendingText)
+    }
+
 
 
     private fun convertListToEntries(waterConsumptionList: List<WaterConsumed>): List<Entry> {
