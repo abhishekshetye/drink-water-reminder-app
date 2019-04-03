@@ -60,8 +60,7 @@ abstract class WaterConsumptionStatsGatherer (dataHandler: DataHandler) {
 
 
     protected fun getFormattedOutStandingGlassesOfWater(water: Int, textView: TextView) {
-        //val glassesPendingText = "<font color='#F44336'>${WaterCalculator.calculateWaterInTermsOfGlasses(water)}</font> glasses of water remaining"
-        val glassesPendingText = "Around <b><font color='#ffffff'>~${WaterCalculator.calculateWaterInTermsOfGlasses(water)}</font></b> Glasses of Water Remaining!"
+        val glassesPendingText = "Around ${WaterCalculator.calculateWaterInTermsOfGlasses(water, true)} Remaining!"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             textView.text = Html.fromHtml(glassesPendingText, Html.FROM_HTML_MODE_LEGACY)
         else

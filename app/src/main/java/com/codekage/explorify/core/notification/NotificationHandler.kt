@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.CountDownTimer
+import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.codekage.explorify.R
@@ -21,16 +22,18 @@ class NotificationHandler {
 
     companion object {
 
-        private val CHANNELID = "1"
-        private val CHANNEL_NAME = "com.codekage.explorify"
-        private val NOTIFICATION_ID = 1
+        private const val CHANNEL_ID = "1"
+        private const val CHANNEL_NAME = "com.codekage.explorify"
+        private const val NOTIFICATION_ID = 1
+        private const val FIRST_TIME = "FIRST_TIME"
+        private const val MORNING_TIME = 7
 
 
-        @TargetApi(26)
+        @RequiresApi(Build.VERSION_CODES.O)
         private fun createChannel(context: Context) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val notificationChannel = NotificationChannel(CHANNELID, CHANNEL_NAME, importance)
+            val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
             notificationChannel.enableVibration(true)
             notificationChannel.setShowBadge(true)
             //notificationChannel.enableLights(true)
@@ -41,7 +44,6 @@ class NotificationHandler {
         }
 
 
-        @TargetApi(Build.VERSION_CODES.O)
         fun setNotification(context: Context, content: String) {
             val closeIntent = Intent(context, AutoDismissReceiver::class.java)
             closeIntent.putExtra("NOTIFICATION_ID", NOTIFICATION_ID)
@@ -52,9 +54,9 @@ class NotificationHandler {
             closeIntent.putExtra("NOTIFICATION_ID", NOTIFICATION_ID)
             var openAppPendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, openAppIntent, 0)
             val drinkWaterAction = NotificationCompat.Action.Builder(R.drawable.icon, "DRINK WATER", openAppPendingIntent).build()
-
-            createChannel(context)
-            var builder = NotificationCompat.Builder(context, CHANNELID)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                createChannel(context)
+            var builder = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.icon)
                     .setOngoing(true)
                     .setAutoCancel(false)
@@ -74,7 +76,6 @@ class NotificationHandler {
 
 
 
-        @TargetApi(Build.VERSION_CODES.O)
         fun setNotification(context: Context, content: String, withDelay: Int) {
             val closeIntent = Intent(context, AutoDismissReceiver::class.java)
             closeIntent.putExtra("NOTIFICATION_ID", NOTIFICATION_ID)
@@ -85,9 +86,9 @@ class NotificationHandler {
             closeIntent.putExtra("NOTIFICATION_ID", NOTIFICATION_ID)
             var openAppPendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, openAppIntent, 0)
             val drinkWaterAction = NotificationCompat.Action.Builder(R.drawable.icon, "DRINK WATER", openAppPendingIntent).build()
-
-            createChannel(context)
-            var builder = NotificationCompat.Builder(context, CHANNELID)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                createChannel(context)
+            var builder = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.icon)
                     .setOngoing(true)
                     .setAutoCancel(false)
@@ -120,6 +121,35 @@ class NotificationHandler {
         }
 
 
+        fun setReminderToDrinkWaterEveryMorning(context: Context) {
+            if(!isFirstTime(context))
+                return
+            var reminderIntent = Intent(context, ReminderBroadcastReceiver::class.java)
+            var reminderPendingIntent = PendingIntent.getBroadcast(context, 0, reminderIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            var alarmManager = context.getSystemService(Activity.ALARM_SERVICE) as AlarmManager
+            var timeToFireAlarm = getTimeForMorning()
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeToFireAlarm, AlarmManager.INTERVAL_DAY, reminderPendingIntent)
+        }
+
+        private fun isFirstTime(context: Context): Boolean {
+            val sharedPrefs = context.getSharedPreferences(context.resources.getString(R.string.prefs_name), Context.MODE_PRIVATE)
+            val firstTime = sharedPrefs.getBoolean(FIRST_TIME, true)
+            Log.d("FIRST_TIME", firstTime.toString())
+            val editor = sharedPrefs.edit()
+            editor.putBoolean(FIRST_TIME, false)
+            return firstTime
+        }
+
+
+        private fun getTimeForMorning(): Long{
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = System.currentTimeMillis()
+            calendar.set(Calendar.HOUR_OF_DAY, MORNING_TIME)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            return calendar.timeInMillis
+        }
+
         private fun getTimeAfterCoupleHours(): Long {
             var calendar = Calendar.getInstance()
             calendar.time = Date()
@@ -127,9 +157,6 @@ class NotificationHandler {
             var date = calendar.time
             return date.time
         }
-
-
-
 
         fun closeNotification(context: Context){
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

@@ -90,18 +90,6 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="30dp"/>
 
-    <TextView
-        android:id="@+id/header_center_text_lower"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="8 glasses of water remaining"
-        android:textSize="18sp"
-        android:textColor="#8399ce"
-        app:layout_constraintTop_toBottomOf="@+id/header_center_text_upper"
-        android:gravity="center_vertical"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="10dp"/>
 
 
     <TextView
@@ -112,7 +100,7 @@
         android:text="Human body is made up of 70% water."
         android:textSize="16sp"
         android:textColor="#8399ce"
-        app:layout_constraintTop_toBottomOf="@+id/header_center_text_lower"
+        app:layout_constraintTop_toBottomOf="@+id/header_center_text_upper"
         android:gravity="center_vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -138,7 +126,7 @@
         android:text="1,500 ml"
         android:textColor="#fff"
         android:textSize="35sp"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="135dp"
         app:layout_constraintTop_toBottomOf="@id/header_center_text"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
@@ -173,6 +161,7 @@
         android:layout_marginTop="20dp"/>
 
 
+
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
         android:layout_width="match_parent"
@@ -186,7 +175,7 @@
     <LinearLayout
         android:id="@+id/stats_container"
         android:layout_width="300dp"
-        android:layout_height="100dp"
+        android:layout_height="75dp"
         android:orientation="horizontal"
         android:weightSum="2"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -255,6 +244,7 @@
     </LinearLayout>
 
 
+
     <Button
         android:id="@+id/drinkWaterButton"
         android:layout_width="wrap_content"
@@ -265,8 +255,26 @@
         android:text="Drink Water"
         android:textColor="#fff"
         app:layout_constraintTop_toBottomOf="@+id/stats_container"
+        android:layout_marginTop="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
+
+
+
+    <TextView
+        android:id="@+id/header_center_text_lower"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="8 glasses of water remaining"
+        android:textSize="17sp"
+        android:textColor="#8399ce"
+        app:layout_constraintTop_toBottomOf="@+id/drinkWaterButton"
+        android:gravity="center_vertical"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="15dp"/>
+
 
 
 

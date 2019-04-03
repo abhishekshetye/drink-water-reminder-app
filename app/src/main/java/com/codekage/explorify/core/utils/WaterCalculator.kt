@@ -1,5 +1,9 @@
 package com.codekage.explorify.core.utils
 
+import com.codekage.explorify.core.utils.Formatter.Companion.getColoredTextForGlassesOfWaterInDialog
+import com.codekage.explorify.core.utils.Formatter.Companion.getColoredTextForSipsOfWaterInDialog
+import com.codekage.explorify.core.utils.Formatter.Companion.getTextForGlassesOfWaterInDialog
+import com.codekage.explorify.core.utils.Formatter.Companion.getTextForSipsOfWaterInDialog
 import kotlin.math.round
 
 /**
@@ -12,11 +16,17 @@ class WaterCalculator {
     companion object {
 
         private const val ML_IN_ONE_GLASS_OF_WATER = 240
+        private const val ML_IN_ONE_SIP_OF_WATER = 80
 
-        fun calculateWaterInTermsOfGlasses(waterInMl: Int): Int {
+        fun calculateWaterInTermsOfGlasses(waterInMl: Int, withColoredText: Boolean = false): CharSequence {
+            if(waterInMl < 240){
+                val sips = waterInMl.div(ML_IN_ONE_SIP_OF_WATER)
+                return if (!withColoredText) getTextForSipsOfWaterInDialog(sips) else getColoredTextForSipsOfWaterInDialog(sips)
+            }
             val waterGlasses = waterInMl.toFloat().div(ML_IN_ONE_GLASS_OF_WATER.toFloat())
-            return round(waterGlasses).toInt()
+            return if (!withColoredText) getTextForGlassesOfWaterInDialog(round(waterGlasses).toInt()) else getColoredTextForGlassesOfWaterInDialog(round(waterGlasses).toInt())
         }
+
 
 
         fun getWaterInMultipleOfFive(progress: Int): Int {

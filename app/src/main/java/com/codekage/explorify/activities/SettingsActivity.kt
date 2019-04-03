@@ -10,11 +10,12 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.codekage.explorify.R
-import com.codekage.explorify.core.utils.Formatter.Companion.getTextForGlassesOfWaterInDialog
 import com.codekage.explorify.core.utils.WaterCalculator.Companion.calculateWaterInTermsOfGlasses
 import com.codekage.explorify.core.utils.WaterCalculator.Companion.getWaterInMultipleOfFive
 import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotification
 import com.codekage.explorify.core.notification.NotificationHandler.Companion.setReminderToDrinkWaterEveryCoupleHours
+import com.codekage.explorify.core.utils.Formatter
+import com.codekage.explorify.core.utils.Formatter.Companion.getFormattedInteger
 import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_settings.*
 
@@ -28,6 +29,9 @@ class SettingsActivity : AppCompatActivity() {
 
         outStandingWater = intent?.extras?.getFloat("OUTSTANDING_WATER")!!
 
+        val titleOfActivity = findViewById<TextView>(R.id.title)
+        Formatter.setTypeFaceToProductSans(this, mutableListOf( titleOfActivity, notificationMainText, notificationSubText,
+                setWaterLimitMainText, setWaterLimitSubText, informationMainText, informationSubText, reminderMainText, reminderSubText))
         updateUI()
 
         waterLimitOptionTab.setOnClickListener {
@@ -79,7 +83,8 @@ class SettingsActivity : AppCompatActivity() {
         waterInput.label = "Daily Water Consumption Goal"
         waterInput.setOnProgressChangedListener { progress ->
             text.text = "${getWaterInMultipleOfFive(progress)} ml"
-            glassesOfWaterText.text = "${getTextForGlassesOfWaterInDialog(calculateWaterInTermsOfGlasses(getWaterInMultipleOfFive(progress)))}"
+            val totalWaterText = calculateWaterInTermsOfGlasses(getWaterInMultipleOfFive(progress))
+            glassesOfWaterText.text = "$totalWaterText"
         }
         waterInput.labelColor = Color.WHITE
 
@@ -97,7 +102,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun updateUI() {
-        setWaterLimitSubText.text = "${getWaterDailyGoal()} ml"
+        setWaterLimitSubText.text = "${getFormattedInteger(getWaterDailyGoal())} ml"
     }
 
     private fun saveWaterConsumptionGoalInSharedPrefs(progress: Int): Boolean {
