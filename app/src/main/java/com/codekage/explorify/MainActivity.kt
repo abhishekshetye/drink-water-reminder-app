@@ -13,6 +13,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
@@ -92,13 +93,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setTodayGathererAsCurrentGathererAndPopulate()
         setNotificationForMorning()
         setFontToProductSans()
+        setNavBarClickListeners()
 
         dataHandler?.getAllWaterConsumptionData()?.let { dataHandler?.printDataAsLogs(it) }
     }
 
+
     private fun setFontToProductSans() {
         Formatter.setTypeFaceToProductSans(this, mutableListOf(waterDrankText, outstandingWaterText, avgWaterConsumptionText,
-                pendingGlassesOfWaterTextView, navtitle, navSubtitle))
+                pendingGlassesOfWaterTextView, navtitle, firstNotificationText, secondNotificationText, thirdNotificationText ))
         drinkWaterButton?.typeface = getProdSansTypeFace(this)
     }
 
@@ -336,21 +339,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        when (item.itemId) {
-            R.id.action_settings -> return true
-            else -> return super.onOptionsItemSelected(item)
-        }
-    }
 
     private fun shareApp() {
         val sendIntent = Intent()
@@ -362,21 +350,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(sendIntent)
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_setting -> {
-                openSettingsActivity()
-            }
-            R.id.nav_about_me -> {
-                openAboutMeActivity()
-            }
-            R.id.nav_share -> {
-                shareApp()
-            }
+    private fun setNavBarClickListeners() {
+        firstNotificationButton.setOnClickListener {
+            openSettingsActivity()
         }
 
-        drawer_layout.closeDrawer(GravityCompat.START)
-        return true
+        secondNotificationButton.setOnClickListener{
+            shareApp()
+        }
+
+        thirdNotificationButton.setOnClickListener{
+            openAboutMeActivity()
+        }
     }
 
     private fun openAboutMeActivity() {
@@ -388,4 +373,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onDestroy()
         NotificationHandler.closeNotification(applicationContext)
     }
+
+    override fun onNavigationItemSelected(p0: MenuItem): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 }

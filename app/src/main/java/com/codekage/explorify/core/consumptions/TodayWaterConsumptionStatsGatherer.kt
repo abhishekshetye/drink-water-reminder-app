@@ -10,11 +10,11 @@ import kotlin.math.max
  * Created by abhisheksimac on 23/03/19.
  */
 
-class TodayWaterConsumptionStatsGatherer (dataHandler: DataHandler, statsButton: Button?, pendingGlassesOfWaterTextView: TextView?) : WaterConsumptionStatsGatherer(dataHandler) {
+class TodayWaterConsumptionStatsGatherer(dataHandler: DataHandler, statsButton: Button?, pendingGlassesOfWaterTextView: TextView?) : WaterConsumptionStatsGatherer(dataHandler) {
 
 
-    var statsButton = statsButton
-    var pendingGlassesOfWaterTextView = pendingGlassesOfWaterTextView
+    private var statsButton = statsButton
+    private var pendingGlassesOfWaterTextView = pendingGlassesOfWaterTextView
 
 
     override fun getDaysOffSet(): Int {

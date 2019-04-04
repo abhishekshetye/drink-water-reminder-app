@@ -16,6 +16,7 @@
         android:id="@+id/imageView"
         android:layout_width="65dp"
         android:layout_height="65dp"
+        android:layout_gravity="center"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:srcCompat="@drawable/icon" />
 
@@ -24,14 +25,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="Drink Water Reminder"
+        android:textSize="16.5sp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="WaterMeter"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
 
     <TextView
         android:id="@+id/navSubtitle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#8399ce"
-        android:text="by codebreakers" />
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Drink Water Reminder App"
+        android:textColor="@color/lightBlue"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
 </LinearLayout>

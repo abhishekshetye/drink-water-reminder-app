@@ -37,14 +37,14 @@ abstract class WaterConsumptionStatsGatherer (dataHandler: DataHandler) {
 
 
     fun fetchWaterEntries(): List<Entry> {
-        var waterConsumptionList =  if (getStartDate() == getEndDate())  this.dataHandler.getAllWaterConsumptionData()
+        val waterConsumptionList =  if (getStartDate() == getEndDate())  this.dataHandler.getAllWaterConsumptionData()
                                     else this.dataHandler.getWaterConsumptionByDate(getStartDate(), getEndDate())
         return convertListToEntries(waterConsumptionList)
     }
 
 
     fun getTotalWaterDrankInMl() : Int{
-        var waterConsumptionList =  if (getStartDate() == getEndDate())  this.dataHandler.getAllWaterConsumptionData()
+        val waterConsumptionList =  if (getStartDate() == getEndDate())  this.dataHandler.getAllWaterConsumptionData()
                                     else this.dataHandler.getWaterConsumptionByDate(getStartDate(), getEndDate())
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

@@ -2,7 +2,6 @@ package com.codekage.explorify.core.consumptions
 
 import android.widget.Button
 import android.widget.TextView
-import com.codekage.explorify.R
 import com.codekage.explorify.core.WaterConsumptionStatsGatherer
 import com.codekage.explorify.core.database.DataHandler
 
@@ -15,8 +14,8 @@ import com.codekage.explorify.core.database.DataHandler
 class MonthWaterConsumptionStatsGatherer(dataHandler: DataHandler, statsButton: Button?, pendingGlassesOfWaterTextView: TextView?) : WaterConsumptionStatsGatherer(dataHandler) {
 
 
-    var statsButton = statsButton
-    var pendingGlassesOfWaterTextView = pendingGlassesOfWaterTextView
+    private var statsButton = statsButton
+    private var pendingGlassesOfWaterTextView = pendingGlassesOfWaterTextView
 
     override fun getDaysOffSet(): Int {
         return 30

@@ -16,8 +16,8 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="#fff"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="20dp"
         android:layout_gravity="center_horizontal"/>
 
     <FrameLayout
@@ -32,8 +32,8 @@
 
         <com.sdsmdg.harjot.crollerTest.Croller
             android:id="@+id/croller"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
             android:layout_gravity="center"
             android:layout_centerInParent="true"
             app:back_circle_color="#EDEDED"
@@ -43,7 +43,7 @@
             app:label_color="#000000"
             app:main_circle_color="#283568"
             app:max="1000"
-            app:label="Water Consumption"
+            app:label="Water Drank"
             app:progress_primary_color="#F44336"
             app:progress_secondary_color="#EEEEEE"
             app:start_offset="45" />

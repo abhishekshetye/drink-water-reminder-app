@@ -10,12 +10,13 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.codekage.explorify.R
-import com.codekage.explorify.core.utils.WaterCalculator.Companion.calculateWaterInTermsOfGlasses
-import com.codekage.explorify.core.utils.WaterCalculator.Companion.getWaterInMultipleOfFive
 import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotification
 import com.codekage.explorify.core.notification.NotificationHandler.Companion.setReminderToDrinkWaterEveryCoupleHours
 import com.codekage.explorify.core.utils.Formatter
 import com.codekage.explorify.core.utils.Formatter.Companion.getFormattedInteger
+import com.codekage.explorify.core.utils.Formatter.Companion.getProdSansTypeFace
+import com.codekage.explorify.core.utils.WaterCalculator.Companion.calculateWaterInTermsOfGlasses
+import com.codekage.explorify.core.utils.WaterCalculator.Companion.getWaterInMultipleOfFive
 import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_settings.*
 
@@ -30,7 +31,7 @@ class SettingsActivity : AppCompatActivity() {
         outStandingWater = intent?.extras?.getFloat("OUTSTANDING_WATER")!!
 
         val titleOfActivity = findViewById<TextView>(R.id.title)
-        Formatter.setTypeFaceToProductSans(this, mutableListOf( titleOfActivity, notificationMainText, notificationSubText,
+        Formatter.setTypeFaceToProductSans(this, mutableListOf(titleOfActivity, notificationMainText, notificationSubText,
                 setWaterLimitMainText, setWaterLimitSubText, informationMainText, informationSubText, reminderMainText, reminderSubText))
         updateUI()
 
@@ -67,6 +68,7 @@ class SettingsActivity : AppCompatActivity() {
         val infoText = dialog.findViewById<TextView>(R.id.info_text)
         val infoOkayButton = dialog.findViewById<Button>(R.id.infoOkayButton)
         infoText.text = resources.getString(R.string.water_drinking_information)
+        infoText.typeface = getProdSansTypeFace(this)
         infoOkayButton.setOnClickListener {
             dialog.dismiss()
         }
