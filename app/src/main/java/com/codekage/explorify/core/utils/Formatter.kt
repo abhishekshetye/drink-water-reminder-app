@@ -40,14 +40,28 @@ class Formatter{
             return formatter.format(number)
         }
 
+        fun getFirstCharaterRed(text: String) : String {
+            val stringBuffer = StringBuffer()
+            var first = true
+            stringBuffer.append("<font color='#F44336'>")
+            for(alphabet in text.toCharArray()){
+                stringBuffer.append(alphabet)
+                if(first){
+                    stringBuffer.append("</font>")
+                    first = false
+                }
+            }
+            return stringBuffer.toString()
+        }
 
+        //it's not allowed to use Product Sans font
         fun setTypeFaceToProductSans(context: Context, textViews: List<TextView?> ){
             val typeFace = getProdSansTypeFace(context)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                textViews.stream().forEach { tv -> tv?.typeface = typeFace }
-            else
-                for (tv in textViews)
-                    tv?.typeface = typeFace
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+//                textViews.stream().forEach { tv -> tv?.typeface = typeFace }
+//            else
+//                for (tv in textViews)
+//                    tv?.typeface = typeFace
 
         }
 

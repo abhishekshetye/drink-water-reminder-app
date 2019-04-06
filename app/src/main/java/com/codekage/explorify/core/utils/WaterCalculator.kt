@@ -19,11 +19,16 @@ class WaterCalculator {
         private const val ML_IN_ONE_SIP_OF_WATER = 80
 
         fun calculateWaterInTermsOfGlasses(waterInMl: Int, withColoredText: Boolean = false): CharSequence {
+
+            if(waterInMl == 0)
+                return "Out of Water :<("
+
             if(waterInMl < 240){
                 var sips = waterInMl.div(ML_IN_ONE_SIP_OF_WATER)
                 sips = Math.max(sips, 1)
                 return if (!withColoredText) getTextForSipsOfWaterInDialog(sips) else getColoredTextForSipsOfWaterInDialog(sips)
             }
+
             val waterGlasses = waterInMl.toFloat().div(ML_IN_ONE_GLASS_OF_WATER.toFloat())
             return if (!withColoredText) getTextForGlassesOfWaterInDialog(round(waterGlasses).toInt()) else getColoredTextForGlassesOfWaterInDialog(round(waterGlasses).toInt())
         }

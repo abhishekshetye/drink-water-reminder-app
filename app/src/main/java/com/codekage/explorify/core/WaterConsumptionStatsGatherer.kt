@@ -9,6 +9,7 @@ import com.codekage.explorify.R
 import com.codekage.explorify.core.utils.WaterCalculator
 import com.codekage.explorify.core.database.DataHandler
 import com.codekage.explorify.core.entities.WaterConsumed
+import com.codekage.explorify.core.utils.WaterCalculator.Companion.calculateWaterInTermsOfGlasses
 import com.github.mikephil.charting.data.Entry
 import java.text.SimpleDateFormat
 import java.util.*
@@ -60,14 +61,17 @@ abstract class WaterConsumptionStatsGatherer (dataHandler: DataHandler) {
 
 
     protected fun getFormattedOutStandingGlassesOfWater(water: Int, textView: TextView) {
-        val glassesPendingText = "Around ${WaterCalculator.calculateWaterInTermsOfGlasses(water, true)} Remaining!"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            textView.text = Html.fromHtml(glassesPendingText, Html.FROM_HTML_MODE_LEGACY)
-        else
-            textView.text = Html.fromHtml(glassesPendingText)
+        val waterInGlasses = calculateWaterInTermsOfGlasses(water, true)
+        if (waterInGlasses.contains("Out of"))
+            textView.text = "Target achieved for today"
+        else {
+            val glassesPendingText = "Around $waterInGlasses Remaining!"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                textView.text = Html.fromHtml(glassesPendingText, Html.FROM_HTML_MODE_LEGACY)
+            else
+                textView.text = Html.fromHtml(glassesPendingText)
+        }
     }
-
-
 
     private fun convertListToEntries(waterConsumptionList: List<WaterConsumed>): List<Entry> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

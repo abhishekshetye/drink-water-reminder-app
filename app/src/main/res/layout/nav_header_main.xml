@@ -18,7 +18,7 @@
         android:layout_height="65dp"
         android:layout_gravity="center"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@drawable/icon" />
+        app:srcCompat="@drawable/ic29" />
 
     <TextView
         android:id="@+id/navtitle"

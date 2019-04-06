@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.NavigationView
@@ -12,6 +13,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
+import android.text.Html
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
@@ -29,6 +31,7 @@ import com.codekage.explorify.core.database.DataHandler
 import com.codekage.explorify.core.notification.NotificationHandler
 import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotification
 import com.codekage.explorify.core.utils.Formatter
+import com.codekage.explorify.core.utils.Formatter.Companion.getFirstCharaterRed
 import com.codekage.explorify.core.utils.Formatter.Companion.getFormattedInteger
 import com.codekage.explorify.core.utils.Formatter.Companion.getProdSansTypeFace
 import com.codekage.explorify.core.utils.WaterCalculator.Companion.calculateWaterInTermsOfGlasses
@@ -92,94 +95,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setUpChartAxes(lineChart)
         setTodayGathererAsCurrentGathererAndPopulate()
         setNotificationForMorning()
-        setFontToProductSans()
         setNavBarClickListeners()
 
         dataHandler?.getAllWaterConsumptionData()?.let { dataHandler?.printDataAsLogs(it) }
-    }
-
-
-    private fun setFontToProductSans() {
-        Formatter.setTypeFaceToProductSans(this, mutableListOf(waterDrankText, outstandingWaterText, avgWaterConsumptionText,
-                pendingGlassesOfWaterTextView, navtitle, firstNotificationText, secondNotificationText, thirdNotificationText ))
-        drinkWaterButton?.typeface = getProdSansTypeFace(this)
-    }
-
-    private fun setNotificationForMorning() {
-        NotificationHandler.setReminderToDrinkWaterEveryMorning(this)
-    }
-
-
-    private fun setTodayGathererAsCurrentGathererAndPopulate() {
-        removeHighlightedBorderOnButton()
-        currentWaterConsumptionStatsGatherer = todayWaterConsumptionStatsGatherer
-        populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
-    }
-
-    private fun removeHighlightedBorderOnButton() {
-        todayStatsButton?.setBackgroundColor(Color.TRANSPARENT)
-        weekStatsButton?.setBackgroundColor(Color.TRANSPARENT)
-        monthStatsButton?.setBackgroundColor(Color.TRANSPARENT)
-    }
-
-    private fun setWeekGathererAsCurrentGathererAndPopulate() {
-        removeHighlightedBorderOnButton()
-        currentWaterConsumptionStatsGatherer = weekWaterConsumptionStatsGatherer
-        populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
-    }
-
-    private fun setMonthGathererAsCurrentGathererAndPopulate() {
-        removeHighlightedBorderOnButton()
-        currentWaterConsumptionStatsGatherer = monthsWaterConsumptionStatsGatherer
-        populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
-    }
-
-    private fun populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer?) {
-        currentWaterConsumptionStatsGatherer?.putHighlightedBorderOnButton()
-        fetchDataFromStatsGathererAndPopulateUI(currentWaterConsumptionStatsGatherer)
-        val totalWaterDrank = currentWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
-        setCircularProgressBar(totalWaterDrank, currentWaterConsumptionStatsGatherer)
-        waterDrankText?.text = "${getFormattedInteger(totalWaterDrank)} ml"
-        val avgWaterConsumption = totalWaterDrank?.div((currentWaterConsumptionStatsGatherer.getDaysOffSet().plus(1)))
-        avgWaterConsumptionText?.text = "${getFormattedInteger(avgWaterConsumption)} ml"
-        var outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
-        outStandingWater = if (outStandingWater <= 0) 0f else outStandingWater
-        outStandingWaterText?.text = "${getFormattedInteger(outStandingWater.toInt())} ml"
-        currentWaterConsumptionStatsGatherer.populatePendingWaterTextView(outStandingWater.toInt())
-    }
-
-    private fun fetchDataFromStatsGathererAndPopulateUI(statsGatherer: WaterConsumptionStatsGatherer?) {
-        var entries = statsGatherer?.fetchWaterEntries()
-        Log.d("FETCH_DATA", "Data returned from SQLite ${entries?.size}")
-        if (entries != null && entries.isNotEmpty())
-            entries.let { populateChart(it) }
-    }
-
-    private fun setCircularProgressBar(totalWaterDrank: Int?, currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer?) {
-        progressBar.progress = 0f
-        progressBar.enableIndeterminateMode(true)
-        object : CountDownTimer(2000, 2000) {
-            override fun onFinish() {
-                runOnUiThread {
-                    progressBar.enableIndeterminateMode(false)
-                    if (getWaterDailyGoal() == 0) {
-                        Toast.makeText(applicationContext, "Daily water consumption goal cannot be zeroooo!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        var days = currentWaterConsumptionStatsGatherer?.getDaysOffSet()!!.plus(1)
-                        progressBar.progress = totalWaterDrank?.toFloat()!!.div(getWaterDailyGoal().toFloat().times(days)).times(100f)
-                        Log.d("UI", "Water drank $totalWaterDrank and ${getWaterDailyGoal()} ml")
-                    }
-                }
-            }
-
-            override fun onTick(p0: Long) {}
-        }.start()
     }
 
     override fun onResume() {
         super.onResume()
         if (currentWaterConsumptionStatsGatherer != null)
             populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
+    }
+
+
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
     }
 
 
@@ -331,12 +264,105 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         lineChart?.axisRight?.setDrawGridLines(false)
     }
 
-    override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+
+    private fun openAboutMeActivity() {
+        val aboutMeActivityIntent = Intent(this, AboutMeActivity::class.java)
+        startActivity(aboutMeActivityIntent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        NotificationHandler.closeNotification(applicationContext)
+    }
+
+    override fun onNavigationItemSelected(p0: MenuItem): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+
+    private fun setNotificationForMorning() {
+        NotificationHandler.setReminderToDrinkWaterEveryMorning(this)
+    }
+
+
+    private fun setTodayGathererAsCurrentGathererAndPopulate() {
+        removeHighlightedBorderOnButton()
+        currentWaterConsumptionStatsGatherer = todayWaterConsumptionStatsGatherer
+        populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
+    }
+
+    private fun removeHighlightedBorderOnButton() {
+        todayStatsButton?.setBackgroundColor(Color.TRANSPARENT)
+        weekStatsButton?.setBackgroundColor(Color.TRANSPARENT)
+        monthStatsButton?.setBackgroundColor(Color.TRANSPARENT)
+    }
+
+    private fun setWeekGathererAsCurrentGathererAndPopulate() {
+        removeHighlightedBorderOnButton()
+        currentWaterConsumptionStatsGatherer = weekWaterConsumptionStatsGatherer
+        populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
+    }
+
+    private fun setMonthGathererAsCurrentGathererAndPopulate() {
+        removeHighlightedBorderOnButton()
+        currentWaterConsumptionStatsGatherer = monthsWaterConsumptionStatsGatherer
+        populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer)
+    }
+
+    private fun populateUIWithWaterGathererStats(currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer?) {
+        currentWaterConsumptionStatsGatherer?.putHighlightedBorderOnButton()
+        fetchDataFromStatsGathererAndPopulateUI(currentWaterConsumptionStatsGatherer)
+        val totalWaterDrank = currentWaterConsumptionStatsGatherer?.getTotalWaterDrankInMl()
+        val avgWaterConsumption = totalWaterDrank?.div((currentWaterConsumptionStatsGatherer.getDaysOffSet().plus(1)))
+        var outStandingWater = getWaterDailyGoal().toFloat().minus(totalWaterDrank?.toFloat()!!)
+        outStandingWater = if (outStandingWater <= 0) 0f else outStandingWater
+
+        setCircularProgressBar(totalWaterDrank, currentWaterConsumptionStatsGatherer)
+        populateTotalWaterDrank(totalWaterDrank)
+        populateAverageWaterDrank(avgWaterConsumption, outStandingWater.toInt())
+
+        currentWaterConsumptionStatsGatherer.populatePendingWaterTextView(outStandingWater.toInt())
+    }
+
+    private fun populateAverageWaterDrank(avgWaterConsumption: Int?, outStandingWater: Int?) {
+        avgWaterConsumptionText?.text = "${getFormattedInteger(avgWaterConsumption)} ml"
+        outStandingWaterText?.text = "${getFormattedInteger(outStandingWater)} ml"
+    }
+
+    private fun populateTotalWaterDrank(totalWaterDrank: Int?) {
+        val waterDrankInStr = getFormattedInteger(totalWaterDrank).toString()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            waterDrankText?.text = Html.fromHtml(getFirstCharaterRed(waterDrankInStr), Html.FROM_HTML_MODE_LEGACY)
+        else
+            waterDrankText?.text = Html.fromHtml(getFirstCharaterRed(waterDrankInStr))
+    }
+
+    private fun fetchDataFromStatsGathererAndPopulateUI(statsGatherer: WaterConsumptionStatsGatherer?) {
+        var entries = statsGatherer?.fetchWaterEntries()
+        Log.d("FETCH_DATA", "Data returned from SQLite ${entries?.size}")
+        if (entries != null && entries.isNotEmpty())
+            entries.let { populateChart(it) }
+    }
+
+    private fun setCircularProgressBar(totalWaterDrank: Int?, currentWaterConsumptionStatsGatherer: WaterConsumptionStatsGatherer?) {
+        progressBar.progress = 0f
+        progressBar.enableIndeterminateMode(true)
+        object : CountDownTimer(2000, 2000) {
+            override fun onFinish() {
+                runOnUiThread {
+                    progressBar.enableIndeterminateMode(false)
+                    if (getWaterDailyGoal() == 0) {
+                        Toast.makeText(applicationContext, "Daily water consumption goal cannot be zeroooo!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        var days = currentWaterConsumptionStatsGatherer?.getDaysOffSet()!!.plus(1)
+                        progressBar.progress = totalWaterDrank?.toFloat()!!.div(getWaterDailyGoal().toFloat().times(days)).times(100f)
+                        Log.d("UI", "Water drank $totalWaterDrank and ${getWaterDailyGoal()} ml")
+                    }
+                }
+            }
+
+            override fun onTick(p0: Long) {}
+        }.start()
     }
 
 
@@ -362,20 +388,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         thirdNotificationButton.setOnClickListener{
             openAboutMeActivity()
         }
-    }
-
-    private fun openAboutMeActivity() {
-        val aboutMeActivityIntent = Intent(this, AboutMeActivity::class.java)
-        startActivity(aboutMeActivityIntent)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        NotificationHandler.closeNotification(applicationContext)
-    }
-
-    override fun onNavigationItemSelected(p0: MenuItem): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
