@@ -32,7 +32,7 @@ class Formatter{
         }
 
         fun getColoredTextForSipsOfWaterInDialog(sips: Int): CharSequence {
-            return if (sips <= 1) "<font color='#ffffff'>~$sips</font> Sip of Water" else "<font color='#ffffff'>~$sips</font> Sips of Water"
+            return if (sips <= 1) "<font color='#FF9700'>~$sips</font> Sip of Water" else "<font color='#ffffff'>~$sips</font> Sips of Water"
         }
 
         fun getFormattedInteger(number: Int?): CharSequence? {

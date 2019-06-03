@@ -42,6 +42,7 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.DefaultValueFormatter
 import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
@@ -120,10 +121,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         selectedStatsSelectableDrawable = ContextCompat.getDrawable(this, R.drawable.button_round_background)
         lineChart = this.findViewById(R.id.lineChart)
         drinkWaterButton = this.findViewById(R.id.drinkWaterButton)
-        drinkWaterButton!!.setOnClickListener({
-            var dialog = createInsertDialog()
+        drinkWaterButton!!.setOnClickListener {
+            val dialog = createInsertDialog()
             dialog.show()
-        })
+        }
         todayStatsButton = this.findViewById(R.id.todayStatsButton)
         weekStatsButton = this.findViewById(R.id.weekStatsButton)
         monthStatsButton = this.findViewById(R.id.monthStatsButton)
@@ -134,25 +135,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationButton = this.findViewById(R.id.navigation_button)
         pendingGlassesOfWaterTextView = this.findViewById(R.id.header_center_text_lower)
 
-        todayStatsButton!!.setOnClickListener({
+        todayStatsButton!!.setOnClickListener {
             setTodayGathererAsCurrentGathererAndPopulate()
-        })
+        }
 
-        weekStatsButton!!.setOnClickListener({
+        weekStatsButton!!.setOnClickListener {
             setWeekGathererAsCurrentGathererAndPopulate()
-        })
+        }
 
-        monthStatsButton!!.setOnClickListener({
+        monthStatsButton!!.setOnClickListener {
             setMonthGathererAsCurrentGathererAndPopulate()
-        })
+        }
 
-        settingsButton!!.setOnClickListener({
+        settingsButton!!.setOnClickListener {
             openSettingsActivity()
-        })
+        }
 
-        navigationButton!!.setOnClickListener({
+        navigationButton!!.setOnClickListener {
             openNavigationDrawer()
-        })
+        }
     }
 
     private fun openSettingsActivity() {
@@ -187,14 +188,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         waterInput.labelColor = Color.WHITE
 
         var saveButton = dialog.findViewById<Button>(R.id.saveButton)
-        saveButton.setOnClickListener({
+        saveButton.setOnClickListener {
             Log.d("SAVING", "Saving ${waterInput.progress} ml of water in the DB")
             val status = dataHandler?.saveWaterConsumption(getCurrentDateInString(), getWaterInMultipleOfFive(waterInput.progress))
             Log.d("SAVING", "Done saving. Returned status is $status")
             Toast.makeText(applicationContext, "Saved entry", Toast.LENGTH_SHORT).show()
             populateUIWithWaterGathererStats(todayWaterConsumptionStatsGatherer)
             dialog.dismiss()
-        })
+        }
         return dialog
     }
 
@@ -219,20 +220,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun populateChart(entries: List<Entry>) {
         var dataSet = createDataSet(entries)
         var lineData = createLineData(dataSet)
-        displayDataOnChart(lineData)
+        displayDataOnChart(lineData, entries.size)
     }
 
-    private fun displayDataOnChart(lineData: LineData) {
+    private fun displayDataOnChart(lineData: LineData, entriesSize : Int) {
         lineChart?.data = lineData
+        lineChart?.setDrawBorders(false)
+        lineChart?.moveViewToX(entriesSize.toFloat())
         lineChart?.invalidate()
+        lineChart?.setVisibleXRangeMaximum(4f)
         lineChart?.animateY(500)
     }
 
     private fun createDataSet(entries: List<Entry>): LineDataSet {
         var dataSet = LineDataSet(entries, "Water")
-        dataSet.mode = LineDataSet.Mode.CUBIC_BEZIER
+        dataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
         dataSet.setDrawFilled(true)
-        dataSet.fillDrawable = ContextCompat.getDrawable(this, R.drawable.side_nav_bar)
+        dataSet.setCircleColor(resources.getColor(R.color.darkThemeRed))
+        dataSet.circleHoleColor = resources.getColor(R.color.darkThemeRed)
+        dataSet.lineWidth = 0f
+        dataSet.setDrawHighlightIndicators(false)
+        dataSet.valueFormatter = DefaultValueFormatter(0)
+        dataSet.fillDrawable = ContextCompat.getDrawable(this, R.drawable.button_focus)
         return dataSet
     }
 
@@ -246,21 +255,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val xAxis = lineChart?.xAxis
         xAxis?.position = XAxis.XAxisPosition.BOTTOM
         xAxis?.textSize = 10f
+        xAxis?.setDrawAxisLine(false)
+        lineChart?.xAxis?.setDrawGridLines(false)
         var description = Description()
         description.text = ""
         lineChart?.description = description
         lineChart?.contentDescription = ""
-        lineChart?.axisLeft?.axisLineColor = resources.getColor(R.color.lightBlue)
-        lineChart?.axisLeft?.textColor = resources.getColor(R.color.lightBlue)
-        lineChart?.xAxis?.axisLineColor = resources.getColor(R.color.lightBlue)
-        lineChart?.xAxis?.textColor = resources.getColor(R.color.lightBlue)
+        lineChart?.axisLeft?.axisLineColor = resources.getColor(R.color.darkThemeLightText1)
+        lineChart?.axisLeft?.textColor = resources.getColor(R.color.darkThemeLightText1)
+        lineChart?.xAxis?.axisLineColor = resources.getColor(R.color.darkThemeLightText1)
+        lineChart?.xAxis?.textColor = resources.getColor(R.color.darkThemeLightText1)
         lineChart?.axisRight?.setDrawAxisLine(false)
         lineChart?.axisRight?.setDrawTopYLabelEntry(false)
         lineChart?.axisRight?.setDrawLabels(false)
         lineChart?.axisRight?.setLabelCount(2, true)
         lineChart?.axisLeft?.setDrawGridLines(false)
+        lineChart?.axisLeft?.setDrawAxisLine(false)
+        lineChart?.axisLeft?.labelCount = 3
         lineChart?.legend?.isEnabled = false
-        lineChart?.xAxis?.setDrawGridLines(false)
+        lineChart?.isAutoScaleMinMaxEnabled = true;
         lineChart?.axisRight?.setDrawGridLines(false)
     }
 
@@ -331,10 +344,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun populateTotalWaterDrank(totalWaterDrank: Int?) {
         val waterDrankInStr = getFormattedInteger(totalWaterDrank).toString()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            waterDrankText?.text = Html.fromHtml(getFirstCharaterRed(waterDrankInStr), Html.FROM_HTML_MODE_LEGACY)
-        else
-            waterDrankText?.text = Html.fromHtml(getFirstCharaterRed(waterDrankInStr))
+        waterDrankText?.text = "$waterDrankInStr ml"
     }
 
     private fun fetchDataFromStatsGathererAndPopulateUI(statsGatherer: WaterConsumptionStatsGatherer?) {

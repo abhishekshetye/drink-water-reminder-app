@@ -41,7 +41,7 @@
             app:indicator_width="10"
             app:is_continuous="true"
             app:label_color="#000000"
-            app:main_circle_color="#283568"
+            app:main_circle_color="@color/darkTheme"
             app:max="1000"
             app:label="Water Drank"
             app:progress_primary_color="#F44336"

@@ -46,7 +46,7 @@
             android:layout_weight="1"
             android:background="@drawable/button_round_background"
             android:text="Today"
-            android:textColor="#8399ce"
+            android:textColor="@color/darkThemeLightText1"
             android:textSize="13sp" />
 
         <Button
@@ -58,7 +58,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text="This Week"
-            android:textColor="#8399ce"
+            android:textColor="@color/darkThemeLightText1"
             android:textSize="13sp" />
 
         <Button
@@ -70,7 +70,7 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text="This Month"
-            android:textColor="#8399ce"
+            android:textColor="@color/darkThemeLightText1"
             android:textSize="13sp" />
 
 
@@ -111,7 +111,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="YOU'VE DRANK"
-        android:textColor="#8399ce"
+        android:textColor="@color/darkThemeLightText1"
         android:textSize="17sp"
         android:layout_marginTop="100dp"
         app:layout_constraintTop_toBottomOf="@id/header_center_text"
@@ -137,8 +137,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="WATER"
-        android:textStyle="bold"
-        android:textColor="#8399ce"
+        android:textColor="@color/darkThemeLightText1"
         android:textSize="17sp"
         android:layout_marginTop="190dp"
         app:layout_constraintTop_toBottomOf="@id/header_center_text"
@@ -165,9 +164,9 @@
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="110dp"
         app:layout_constraintTop_toBottomOf="@id/progressBar"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="30dp">
 
     </com.github.mikephil.charting.charts.LineChart>
 
@@ -193,7 +192,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Average Water Consumption"
-                android:textColor="#8399ce"
+                android:textColor="@color/darkThemeLightText1"
                 android:textSize="15sp"
                 android:layout_gravity="center"
                 android:gravity="center"/>
@@ -204,7 +203,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1,500 ml/day"
-                android:textColor="#eca926"
+                android:textColor="#FF9700"
                 android:textSize="14sp"
                 android:layout_gravity="center"
                 android:gravity="center"
@@ -222,7 +221,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Outstanding Water Consumption"
-                android:textColor="#8399ce"
+                android:textColor="@color/darkThemeLightText1"
                 android:textSize="15sp"
                 android:layout_gravity="center"
                 android:gravity="center"/>
@@ -233,7 +232,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1,200 ml"
-                android:textColor="#eca926"
+                android:textColor="#FF9700"
                 android:textSize="14sp"
                 android:layout_gravity="center"
                 android:gravity="center"
@@ -250,7 +249,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/button_round_background_big"
-        android:textSize="17sp"
+        android:textSize="16sp"
         android:padding="10dp"
         android:text="Drink Water"
         android:textColor="#fff"
@@ -267,7 +266,7 @@
         android:layout_height="wrap_content"
         android:text="8 glasses of water remaining"
         android:textSize="17sp"
-        android:textColor="#8399ce"
+        android:textColor="@color/darkThemeLightText1"
         app:layout_constraintTop_toBottomOf="@+id/drinkWaterButton"
         android:gravity="center_vertical"
         app:layout_constraintLeft_toLeftOf="parent"
