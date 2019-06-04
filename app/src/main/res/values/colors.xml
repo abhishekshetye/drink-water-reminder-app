@@ -15,4 +15,7 @@
     <color name="darkThemeRed">#F44336</color>
     <color name="darkThemeDark">#24242E</color>
     <color name="darkThemeDark1">#2C2E3C</color>
+    <color name="darkThemeOrange">#FF9700</color>
+    <color name="darkThemeBlue">#536DFE</color>
+    <color name="darkThemeGreen">#1DE9B6</color>
 </resources>

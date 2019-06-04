@@ -166,7 +166,7 @@
         android:layout_width="match_parent"
         android:layout_height="110dp"
         app:layout_constraintTop_toBottomOf="@id/progressBar"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="20dp">
 
     </com.github.mikephil.charting.charts.LineChart>
 
@@ -244,11 +244,13 @@
 
 
 
-    <Button
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/drinkWaterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_round_background_big"
+        app:backgroundTint="@color/darkThemeGreen"
+        app:elevation="5dp"
+        android:src="@drawable/ic_local_drink_black_24dp"
         android:textSize="16sp"
         android:padding="10dp"
         android:text="Drink Water"
@@ -265,7 +267,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="8 glasses of water remaining"
-        android:textSize="17sp"
+        android:textSize="15sp"
         android:textColor="@color/darkThemeLightText1"
         app:layout_constraintTop_toBottomOf="@+id/drinkWaterButton"
         android:gravity="center_vertical"

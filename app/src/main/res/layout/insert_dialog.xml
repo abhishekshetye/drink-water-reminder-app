@@ -44,7 +44,7 @@
             app:main_circle_color="@color/darkTheme"
             app:max="1000"
             app:label="Water Drank"
-            app:progress_primary_color="#F44336"
+            app:progress_primary_color="@color/darkThemeOrange"
             app:progress_secondary_color="#EEEEEE"
             app:start_offset="45" />
 

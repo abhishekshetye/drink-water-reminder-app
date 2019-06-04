@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     private var lineChart: LineChart? = null
-    private var drinkWaterButton: Button? = null
+    private var drinkWaterButton: FloatingActionButton? = null
     private var todayStatsButton: Button? = null
     private var weekStatsButton: Button? = null
     private var monthStatsButton: Button? = null
@@ -255,6 +256,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val xAxis = lineChart?.xAxis
         xAxis?.position = XAxis.XAxisPosition.BOTTOM
         xAxis?.textSize = 10f
+        xAxis?.setDrawLabels(false)
         xAxis?.setDrawAxisLine(false)
         lineChart?.xAxis?.setDrawGridLines(false)
         var description = Description()
