@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
-    android:background="@drawable/main_background"
+    android:background="#E6E6E6"
     android:gravity="bottom"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -18,7 +18,7 @@
         android:layout_height="65dp"
         android:layout_gravity="center"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@drawable/ic29" />
+        app:srcCompat="@drawable/watermeter_icon" />
 
     <TextView
         android:id="@+id/navtitle"
@@ -28,8 +28,8 @@
         android:textSize="16.5sp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="WaterMeter"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textColor="#000"
+        android:text="WaterMeter" />
 
 
     <TextView
@@ -39,7 +39,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="Drink Water Reminder App"
-        android:textColor="@color/lightBlue"
+        android:textColor="#424242"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
 </LinearLayout>
