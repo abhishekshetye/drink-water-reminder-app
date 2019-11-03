@@ -30,10 +30,10 @@ class NotificationHandler {
 
 
         @RequiresApi(Build.VERSION_CODES.O)
-        private fun createChannel(context: Context) {
+        private fun createChannel(context: Context, clannelID: String, channelName: String) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val notificationChannel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance)
+            val notificationChannel = NotificationChannel(clannelID, channelName, importance)
             notificationChannel.enableVibration(true)
             notificationChannel.setShowBadge(true)
             //notificationChannel.enableLights(true)
@@ -44,7 +44,7 @@ class NotificationHandler {
         }
 
 
-        fun setNotification(context: Context, content: String) {
+        fun setNotification(context: Context, title: String, contentInfo: String, content: String) {
             val closeIntent = Intent(context, AutoDismissReceiver::class.java)
             closeIntent.putExtra("NOTIFICATION_ID", NOTIFICATION_ID)
             var dismissNotificationPendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, closeIntent, 0)
@@ -55,7 +55,7 @@ class NotificationHandler {
             var openAppPendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, openAppIntent, 0)
             val drinkWaterAction = NotificationCompat.Action.Builder(R.drawable.icon, "DRINK WATER", openAppPendingIntent).build()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                createChannel(context)
+                createChannel(context, CHANNEL_ID, CHANNEL_NAME)
             var builder = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.watermeter_icon)
                     .setOngoing(true)
@@ -63,8 +63,8 @@ class NotificationHandler {
                     .addAction(drinkWaterAction)
                     .addAction(dismissAction)
                     .setContentIntent(openAppPendingIntent)
-                    .setContentTitle(context.getString(R.string.notification_title))
-                    .setContentInfo(context.getString(R.string.notification_subtext))
+                    .setContentTitle(title) //context.getString(R.string.notification_title)
+                    .setContentInfo(contentInfo) //context.getString(R.string.notification_subtext)
                     .setContentText(content)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()
@@ -76,7 +76,7 @@ class NotificationHandler {
 
 
 
-        fun setNotification(context: Context, content: String, withDelay: Int) {
+        fun setNotificationWithDelay(context: Context, title: String, contentInfo: String, content: String, withDelay: Int) {
             val closeIntent = Intent(context, AutoDismissReceiver::class.java)
             closeIntent.putExtra("NOTIFICATION_ID", NOTIFICATION_ID)
             var dismissNotificationPendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, closeIntent, 0)
@@ -87,7 +87,7 @@ class NotificationHandler {
             var openAppPendingIntent = PendingIntent.getBroadcast(context, NOTIFICATION_ID, openAppIntent, 0)
             val drinkWaterAction = NotificationCompat.Action.Builder(R.drawable.icon, "DRINK WATER", openAppPendingIntent).build()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                createChannel(context)
+                createChannel(context, CHANNEL_ID, CHANNEL_NAME)
             var builder = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.watermeter_icon)
                     .setOngoing(true)
@@ -95,8 +95,8 @@ class NotificationHandler {
                     .addAction(drinkWaterAction)
                     .addAction(dismissAction)
                     .setContentIntent(openAppPendingIntent)
-                    .setContentTitle(context.getString(R.string.notification_title))
-                    .setContentInfo(context.getString(R.string.notification_subtext))
+                    .setContentTitle(title)
+                    .setContentInfo(contentInfo)
                     .setContentText(content)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .build()

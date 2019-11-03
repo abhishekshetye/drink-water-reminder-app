@@ -12,13 +12,14 @@ import com.codekage.explorify.R
 class ReminderBroadcastReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.d("NOTIFICATION", "Reminder! Drink water")
-        val sharedPrefs = context?.getSharedPreferences(context.resources.getString(R.string.prefs_name), Context.MODE_PRIVATE)
-        var featureEnabled = sharedPrefs?.getBoolean(context.getString(R.string.reminderEnabled), false)
-        if(featureEnabled!!) {
-            context?.let { NotificationHandler.setReminderToDrinkWaterEveryCoupleHours(it) }
-            context?.let { NotificationHandler.setNotification(it, "Water Drinking Reminder") }
+
+        if (context != null) {
+            NotificationHandler.setNotification(context, context.getString(R.string.notification_title), context.getString(R.string.notification_subtext),"Reminder : Drink Water")
+        } else {
+            Log.d("ALARMFIX", "Context is null")
         }
+
+        Log.d("ALARMFIX", "Notified")
     }
 
 }

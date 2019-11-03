@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.design.widget.FloatingActionButton
@@ -14,10 +13,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
-import android.text.Html
 import android.util.Log
-import android.view.Gravity
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
@@ -29,12 +25,11 @@ import com.codekage.explorify.core.consumptions.MonthWaterConsumptionStatsGather
 import com.codekage.explorify.core.consumptions.TodayWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.consumptions.WeekWaterConsumptionStatsGatherer
 import com.codekage.explorify.core.database.DataHandler
+import com.codekage.explorify.core.notification.HourlyReminder
 import com.codekage.explorify.core.notification.NotificationHandler
-import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotification
-import com.codekage.explorify.core.utils.Formatter
-import com.codekage.explorify.core.utils.Formatter.Companion.getFirstCharaterRed
+import com.codekage.explorify.core.notification.NotificationHandler.Companion.setNotificationWithDelay
+import com.codekage.explorify.core.notification.ReminderBroadcastReceiver
 import com.codekage.explorify.core.utils.Formatter.Companion.getFormattedInteger
-import com.codekage.explorify.core.utils.Formatter.Companion.getProdSansTypeFace
 import com.codekage.explorify.core.utils.WaterCalculator.Companion.calculateWaterInTermsOfGlasses
 import com.codekage.explorify.core.utils.WaterCalculator.Companion.getWaterInMultipleOfFive
 import com.github.mikephil.charting.charts.LineChart
@@ -48,7 +43,6 @@ import com.sdsmdg.harjot.crollerTest.Croller
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.nav_header_main.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -81,7 +75,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
@@ -89,15 +82,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        if (intent.extras != null && intent.extras.getBoolean("FROM_NOTIFICATION"))
-            setNotification(applicationContext, "Reminder to drink water", 700)
+        if (intent.extras != null && intent.extras!!.getBoolean("FROM_NOTIFICATION"))
+            setNotificationWithDelay(applicationContext,getString(R.string.notification_title), getString(R.string.notification_subtext),"Reminder to drink water", 700)
 
         initUIComponents()
         initDataHandlerAndStatsGatherer()
         setUpChartAxes(lineChart)
         setTodayGathererAsCurrentGathererAndPopulate()
-        setNotificationForMorning()
         setNavBarClickListeners()
+
+        HourlyReminder.setReminderInstantly(this, ReminderBroadcastReceiver::class.java)
 
         dataHandler?.getAllWaterConsumptionData()?.let { dataHandler?.printDataAsLogs(it) }
     }
@@ -292,11 +286,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-
-    private fun setNotificationForMorning() {
-        NotificationHandler.setReminderToDrinkWaterEveryMorning(this)
     }
 
 

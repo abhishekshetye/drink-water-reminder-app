@@ -40,18 +40,18 @@ class SettingsActivity : AppCompatActivity() {
             dialog.show()
         }
 
-        notificationOptionTab.setOnClickListener({
-            setNotification(applicationContext, "$outStandingWater ml water outstanding for today's goal")
+        notificationOptionTab.setOnClickListener {
+            setNotification(applicationContext, getString(R.string.notification_title), getString(R.string.notification_subtext),"$outStandingWater ml water outstanding for today's goal")
             Toast.makeText(this, "Notification set", Toast.LENGTH_SHORT).show()
-        })
+        }
 
 
-        informationOptionTab.setOnClickListener({
+        informationOptionTab.setOnClickListener {
             var dialog = createInformationDialog()
             dialog.show()
-        })
+        }
 
-        reminderOptionTab.setOnClickListener({
+        reminderOptionTab.setOnClickListener {
             var featureEnabled = toggleReminderSetting()
             if (featureEnabled) {
                 setReminderToDrinkWaterEveryCoupleHours(applicationContext)
@@ -59,7 +59,7 @@ class SettingsActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Alarm disabled", Toast.LENGTH_SHORT).show()
             }
-        })
+        }
     }
 
     private fun createInformationDialog(): Dialog {
@@ -91,7 +91,7 @@ class SettingsActivity : AppCompatActivity() {
         waterInput.labelColor = Color.WHITE
 
         var saveButton = dialog.findViewById<Button>(R.id.saveButton)
-        saveButton.setOnClickListener({
+        saveButton.setOnClickListener {
             Log.d("SAVING", "Setting ${waterInput.progress} ml of water as daily goal")
             var savedSuccessfully = saveWaterConsumptionGoalInSharedPrefs(getWaterInMultipleOfFive(waterInput.progress))
             if (savedSuccessfully) {
@@ -99,7 +99,7 @@ class SettingsActivity : AppCompatActivity() {
                 updateUI()
                 dialog.dismiss()
             }
-        })
+        }
         return dialog
     }
 
